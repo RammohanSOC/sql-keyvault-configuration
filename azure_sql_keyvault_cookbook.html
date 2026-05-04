@@ -1,0 +1,724 @@
+
+<style>
+  :root {
+    --azure-blue: #0078D4;
+    --azure-blue-dark: #005A9E;
+    --azure-blue-light: #E6F2FC;
+    --azure-green: #107C10;
+    --azure-green-light: #DFF6DD;
+    --azure-amber: #FF8C00;
+    --azure-amber-light: #FFF4CE;
+    --azure-red: #D13438;
+    --azure-red-light: #FDE7E9;
+    --azure-purple: #5C2D91;
+    --azure-purple-light: #EDE7F6;
+    --surface: var(--color-background-primary);
+    --surface2: var(--color-background-secondary);
+    --border: var(--color-border-tertiary);
+    --text: var(--color-text-primary);
+    --muted: var(--color-text-secondary);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .cookbook {
+    font-family: var(--font-sans);
+    padding: 0 0 2rem;
+    max-width: 680px;
+  }
+
+  .hero {
+    background: var(--azure-blue);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.5rem;
+    color: white;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1 {
+    font-size: 20px;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 0.4rem;
+  }
+
+  .hero p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+  }
+
+  .arch-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .arch-node {
+    background: rgba(255,255,255,0.15);
+    border: 0.5px solid rgba(255,255,255,0.3);
+    color: white;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .arch-arrow {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+  }
+
+  .prereqs {
+    background: var(--azure-amber-light);
+    border: 0.5px solid var(--azure-amber);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .prereqs-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #7A4A00;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .prereq-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #5C3A00;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  .check { color: var(--azure-green); font-size: 15px; }
+  .cross { color: var(--azure-red); font-size: 15px; }
+
+  .steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .step-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .step-card:hover {
+    border-color: var(--color-border-secondary);
+  }
+
+  .step-card.active {
+    border-color: var(--azure-blue);
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem 1.25rem;
+    user-select: none;
+  }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .step-num.blue { background: var(--azure-blue-light); color: var(--azure-blue-dark); }
+  .step-num.green { background: var(--azure-green-light); color: var(--azure-green); }
+  .step-num.purple { background: var(--azure-purple-light); color: var(--azure-purple); }
+
+  .step-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .step-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--azure-blue-light);
+    color: var(--azure-blue-dark);
+  }
+
+  .step-chevron {
+    color: var(--muted);
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+
+  .step-card.active .step-chevron {
+    transform: rotate(90deg);
+  }
+
+  .step-body {
+    display: none;
+    border-top: 0.5px solid var(--border);
+    padding: 1rem 1.25rem 1.25rem;
+  }
+
+  .step-card.active .step-body {
+    display: block;
+  }
+
+  .nav-path {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: var(--border-radius-md);
+    padding: 8px 12px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-path-item {
+    font-size: 12px;
+    color: var(--azure-blue);
+    font-weight: 500;
+  }
+
+  .nav-sep {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .field-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 0.5rem;
+  }
+
+  .field-table th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px 10px;
+    background: var(--surface2);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .field-table th:first-child { border-radius: 6px 0 0 0; }
+  .field-table th:last-child { border-radius: 0 6px 0 0; }
+
+  .field-table td {
+    padding: 8px 10px;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  .field-table td:first-child {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .field-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .val-tag {
+    display: inline-block;
+    background: var(--azure-blue-light);
+    color: var(--azure-blue-dark);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+  }
+
+  .notice {
+    border-left: 3px solid var(--azure-amber);
+    background: var(--azure-amber-light);
+    padding: 8px 12px;
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+    font-size: 12px;
+    color: #5C3A00;
+    margin: 0.75rem 0;
+    line-height: 1.5;
+  }
+
+  .notice strong { color: #3D2600; }
+
+  .info-note {
+    border-left: 3px solid var(--azure-blue);
+    background: var(--azure-blue-light);
+    padding: 8px 12px;
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+    font-size: 12px;
+    color: var(--azure-blue-dark);
+    margin: 0.75rem 0;
+    line-height: 1.5;
+  }
+
+  .step-body p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .verify-box {
+    background: var(--azure-green-light);
+    border: 0.5px solid var(--azure-green);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .verify-box .v-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0A5A0A;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .verify-box .v-item {
+    font-size: 13px;
+    color: #0A5A0A;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .bottom-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+  }
+
+  .bottom-card h3 {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 4px 0;
+    color: var(--text);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .cost-row:last-child { border-bottom: none; font-weight: 500; }
+
+  .practice-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    padding: 4px 0;
+    line-height: 1.5;
+  }
+
+  .practice-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--azure-blue);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .trouble-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .trouble-table th {
+    text-align: left;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface2);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .trouble-table td {
+    padding: 7px 8px;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+
+  .trouble-table tr:last-child td { border-bottom: none; }
+
+  .trouble-table td:first-child { color: var(--azure-red); font-weight: 500; }
+  .trouble-table td:last-child { color: var(--azure-green); }
+
+  .bonus-section {
+    background: var(--azure-purple-light);
+    border: 0.5px solid #C4A8E8;
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .bonus-section h3 {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--azure-purple);
+    margin-bottom: 0.6rem;
+  }
+
+  .bonus-item {
+    font-size: 13px;
+    color: #3A1C69;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bonus-icon {
+    width: 20px;
+    height: 20px;
+    background: var(--azure-purple);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .bonus-icon svg { width: 10px; height: 10px; fill: white; }
+
+  @media (max-width: 480px) {
+    .bottom-grid { grid-template-columns: 1fr; }
+    .arch-bar { gap: 4px; }
+  }
+</style>
+
+<div class="cookbook">
+  <div class="hero">
+    <div class="hero-badge">Azure Cookbook</div>
+    <h1>SQL + Key Vault Encryption (TDE with CMK)</h1>
+    <p>Customer-managed key encryption for Azure SQL using Key Vault, Managed Identity, and RBAC. Used in banking, healthcare, and government.</p>
+    <div class="arch-bar">
+      <div class="arch-node">Azure SQL Server</div>
+      <div class="arch-arrow">▶</div>
+      <div class="arch-node">TDE</div>
+      <div class="arch-arrow">▶</div>
+      <div class="arch-node">Key Vault (CMK)</div>
+    </div>
+  </div>
+
+  <div class="prereqs">
+    <div class="prereqs-title">Ingredients — Prerequisites</div>
+    <div class="prereq-item"><span class="check">✓</span> Resource Group exists</div>
+    <div class="prereq-item"><span class="check">✓</span> Key Vault created</div>
+    <div class="prereq-item"><span class="cross">✗</span> Do NOT use MySQL Arc — use Azure SQL only</div>
+  </div>
+
+  <div class="steps-container" id="steps">
+
+    <div class="step-card" onclick="toggle(this)">
+      <div class="step-header">
+        <div class="step-num blue">1</div>
+        <div class="step-title">Create Azure SQL Server + Database</div>
+        <div class="step-tag">SQL</div>
+        <div class="step-chevron">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="nav-path">
+          <span class="nav-path-item">Azure Portal</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Search: SQL databases</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">+ Create</span>
+        </div>
+        <table class="field-table">
+          <thead><tr><th>Field</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>DB Name</td><td><span class="val-tag">sqldb-demo</span></td></tr>
+            <tr><td>Server</td><td><span class="val-tag">Create new → my-sql-server</span></td></tr>
+            <tr><td>Region</td><td>Same as Key Vault</td></tr>
+            <tr><td>Auth</td><td><span class="val-tag">SQL + Password</span></td></tr>
+          </tbody>
+        </table>
+        <div class="info-note" style="margin-top:0.75rem;">Click <strong>Review + Create → Create</strong> to deploy both the server and the database.</div>
+      </div>
+    </div>
+
+    <div class="step-card" onclick="toggle(this)">
+      <div class="step-header">
+        <div class="step-num blue">2</div>
+        <div class="step-title">Prepare Key Vault — Enable Required Settings</div>
+        <div class="step-tag">Key Vault</div>
+        <div class="step-chevron">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="nav-path">
+          <span class="nav-path-item">Key Vault</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">kv-admin-demo</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Settings → Properties</span>
+        </div>
+        <div class="notice"><strong>Very important:</strong> Both settings below must be enabled before creating the key. They cannot be disabled once on.</div>
+        <table class="field-table">
+          <thead><tr><th>Setting</th><th>Required State</th></tr></thead>
+          <tbody>
+            <tr><td>Soft Delete</td><td><span class="val-tag">ON ✓</span></td></tr>
+            <tr><td>Purge Protection</td><td><span class="val-tag">ON ✓</span></td></tr>
+          </tbody>
+        </table>
+        <div class="info-note" style="margin-top:0.75rem;">Click <strong>Save</strong> before proceeding.</div>
+      </div>
+    </div>
+
+    <div class="step-card" onclick="toggle(this)">
+      <div class="step-header">
+        <div class="step-num blue">3</div>
+        <div class="step-title">Create Encryption Key</div>
+        <div class="step-tag">Key Vault</div>
+        <div class="step-chevron">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="nav-path">
+          <span class="nav-path-item">Key Vault</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Keys</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">+ Generate/Import</span>
+        </div>
+        <table class="field-table">
+          <thead><tr><th>Field</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Name</td><td><span class="val-tag">sql-key</span></td></tr>
+            <tr><td>Type</td><td><span class="val-tag">RSA</span></td></tr>
+            <tr><td>Size</td><td><span class="val-tag">2048</span></td></tr>
+          </tbody>
+        </table>
+        <div class="info-note" style="margin-top:0.75rem;">Click <strong>Create</strong>. The key will appear in the keys list — note the key identifier URI for reference.</div>
+      </div>
+    </div>
+
+    <div class="step-card" onclick="toggle(this)">
+      <div class="step-header">
+        <div class="step-num purple">4</div>
+        <div class="step-title">Enable System-Assigned Managed Identity on SQL Server</div>
+        <div class="step-tag">Identity</div>
+        <div class="step-chevron">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="nav-path">
+          <span class="nav-path-item">SQL Server</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">my-sql-server</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Identity</span>
+        </div>
+        <p>The SQL Server needs an identity so Azure can grant it access to Key Vault. System-assigned identity is tied to this server's lifecycle.</p>
+        <table class="field-table">
+          <thead><tr><th>Setting</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>System assigned</td><td><span class="val-tag">Toggle → ON</span></td></tr>
+          </tbody>
+        </table>
+        <div class="info-note" style="margin-top:0.75rem;">Click <strong>Save</strong>. An Object ID will appear — this is the identity used in the next step.</div>
+      </div>
+    </div>
+
+    <div class="step-card" onclick="toggle(this)">
+      <div class="step-header">
+        <div class="step-num purple">5</div>
+        <div class="step-title">Grant Key Vault Permission to SQL Server via RBAC</div>
+        <div class="step-tag">IAM</div>
+        <div class="step-chevron">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="nav-path">
+          <span class="nav-path-item">Key Vault</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Access control (IAM)</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">+ Add role assignment</span>
+        </div>
+        <table class="field-table">
+          <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Role</td><td><span class="val-tag">Key Vault Crypto Service Encryption User</span></td></tr>
+            <tr><td>Assign access to</td><td><span class="val-tag">Managed identity</span></td></tr>
+            <tr><td>Select</td><td><span class="val-tag">my-sql-server</span></td></tr>
+          </tbody>
+        </table>
+        <div class="notice" style="margin-top:0.75rem;"><strong>RBAC propagation delay:</strong> After saving, wait 2–5 minutes before proceeding to step 6. Role assignments are not instant.</div>
+      </div>
+    </div>
+
+    <div class="step-card" onclick="toggle(this)">
+      <div class="step-header">
+        <div class="step-num green">6</div>
+        <div class="step-title">Configure TDE — Customer-Managed Key</div>
+        <div class="step-tag">TDE</div>
+        <div class="step-chevron">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="nav-path">
+          <span class="nav-path-item">SQL Server</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Security</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Transparent Data Encryption</span>
+        </div>
+        <table class="field-table">
+          <thead><tr><th>Setting</th><th>Selection</th></tr></thead>
+          <tbody>
+            <tr><td>Encryption type</td><td><span class="val-tag">Customer-managed key</span></td></tr>
+            <tr><td>Key Vault</td><td><span class="val-tag">kv-admin-demo</span></td></tr>
+            <tr><td>Key</td><td><span class="val-tag">sql-key</span></td></tr>
+          </tbody>
+        </table>
+        <div class="info-note" style="margin-top:0.75rem;">Click <strong>Save</strong>. Azure will now use your Key Vault key to wrap the Database Encryption Key (DEK).</div>
+      </div>
+    </div>
+
+    <div class="step-card" onclick="toggle(this)">
+      <div class="step-header">
+        <div class="step-num green">7</div>
+        <div class="step-title">Verify the Setup</div>
+        <div class="step-tag">Done</div>
+        <div class="step-chevron">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="nav-path">
+          <span class="nav-path-item">SQL Server</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Security</span>
+          <span class="nav-sep">›</span>
+          <span class="nav-path-item">Transparent Data Encryption</span>
+        </div>
+        <div class="verify-box">
+          <div class="v-title">Expected result</div>
+          <div class="v-item">✓ Encryption type: Customer-managed key</div>
+          <div class="v-item">✓ Key Vault: kv-admin-demo</div>
+          <div class="v-item">✓ Key: sql-key</div>
+        </div>
+        <p>If the TDE page shows "Customer-managed key" and the key reference matches, your SQL data at rest is now protected by your Key Vault key. You own the encryption.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:1.25rem; background:var(--surface); border:0.5px solid var(--border); border-radius:var(--border-radius-lg); padding:1rem 1.25rem;">
+    <h3 style="font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;">Troubleshooting</h3>
+    <table class="trouble-table">
+      <thead><tr><th>Issue</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Key not visible</td><td>Identity not enabled on SQL Server (step 4)</td></tr>
+        <tr><td>Permission denied</td><td>Role not assigned or wrong role (step 5)</td></tr>
+        <tr><td>Still failing</td><td>Wait 5 min — RBAC propagation delay</td></tr>
+        <tr><td>Wrong service error</td><td>Must be Azure SQL, not MySQL Arc</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="bottom-card">
+      <h3>Cost estimate</h3>
+      <div class="cost-row"><span>SQL DB (Basic)</span><span>~$5/month</span></div>
+      <div class="cost-row"><span>Key Vault</span><span>~$1/month</span></div>
+      <div class="cost-row"><span>Total</span><span>~$6–10/month</span></div>
+    </div>
+    <div class="bottom-card">
+      <h3>Security best practices</h3>
+      <div class="practice-item"><div class="practice-dot"></div>Use RBAC, not access policies</div>
+      <div class="practice-item"><div class="practice-dot"></div>Rotate keys regularly</div>
+      <div class="practice-item"><div class="practice-dot"></div>Restrict Key Vault network access</div>
+      <div class="practice-item"><div class="practice-dot"></div>Enable logging via Azure Monitor</div>
+    </div>
+  </div>
+
+  <div class="bonus-section">
+    <h3>Bonus challenges — next level</h3>
+    <div class="bonus-item">
+      <div class="bonus-icon"><svg viewBox="0 0 10 10"><path d="M5 1 L9 5 L5 9 L1 5 Z"/></svg></div>
+      Rotate the encryption key (test the rotation flow)
+    </div>
+    <div class="bonus-item">
+      <div class="bonus-icon"><svg viewBox="0 0 10 10"><path d="M5 1 L9 5 L5 9 L1 5 Z"/></svg></div>
+      Add a second database to the same server
+    </div>
+    <div class="bonus-item">
+      <div class="bonus-icon"><svg viewBox="0 0 10 10"><path d="M5 1 L9 5 L5 9 L1 5 Z"/></svg></div>
+      Restrict Key Vault to a private endpoint only
+    </div>
+    <div class="bonus-item">
+      <div class="bonus-icon"><svg viewBox="0 0 10 10"><path d="M5 1 L9 5 L5 9 L1 5 Z"/></svg></div>
+      Set up multi-region DR with the same CMK
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(card) {
+    const isActive = card.classList.contains('active');
+    document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
+    if (!isActive) card.classList.add('active');
+  }
+</script>
